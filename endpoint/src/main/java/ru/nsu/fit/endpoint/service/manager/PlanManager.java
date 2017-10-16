@@ -20,6 +20,8 @@ public class PlanManager extends ParentManager {
     /* fee - больше либо равно 0 но меньше либо равно 999999.
      */
     public Plan createPlan(Plan plan) {
+
+        // типо проверка тут
         return dbService.createPlan(plan);
     }
 
