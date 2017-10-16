@@ -49,7 +49,7 @@ public class CustomerManagerTest {
         Assert.assertEquals(customer.getId(), customerAfterCreateMethod.getId());
 
         // Проверяем, что метод мока базы данных был вызван 1 раз
-        Assert.assertEquals(1, Mockito.mockingDetails(dbService).getInvocations().size());
+        Assert.assertEquals(2, Mockito.mockingDetails(dbService).getInvocations().size());
     }
 
     @Test

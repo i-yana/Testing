@@ -24,13 +24,39 @@ public class CustomerManager extends ParentManager {
      * money - должно быть равно 0.
      */
     public Customer createCustomer(Customer customer) {
+
         Validate.notNull(customer, "Argument 'customerData' is null.");
 
-        Validate.notNull(customer.getPass());
-        Validate.isTrue(customer.getPass().length() >= 6 && customer.getPass().length() < 13, "Password's length should be more or equal 6 symbols and less or equal 12 symbols.");
-        Validate.isTrue(!customer.getPass().equalsIgnoreCase("123qwe"), "Password is easy.");
+        String firstName = customer.getFirstName();
+        String lastName = customer.getLastName();
+        String login = customer.getLogin();
+        String pass = customer.getPass();
 
-        // TODO: необходимо дописать дополнительные проверки
+        Validate.notEmpty(customer.getPass(), "Password is empty");
+        Validate.notEmpty(customer.getFirstName(), "FirstName is empty");
+        Validate.notEmpty(customer.getLastName(), "LastName is empty");
+
+        Validate.isTrue(firstName.length() >= 2 && firstName.length() <= 12,
+                        "FirstName's length should be more or equal 2 symbols and less or equal 12 symbols.");
+        Validate.isTrue(firstName.equals(firstName.replace(" ",""))
+                        && firstName.matches("[a-zA-Z]+$")
+                        && firstName.equals(toNameCase(firstName)),
+                        "FirstName should contain symbols of latin alphabet without spaces");
+
+        Validate.isTrue(lastName.length() >= 2 && lastName.length() <= 12,
+                        "LastName's length should be more or equal 2 symbols and less or equal 12 symbols.");
+        Validate.isTrue(lastName.equals(lastName.replace(" ",""))
+                        && lastName.matches("[a-zA-Z]+$")
+                        && lastName.equals(toNameCase(lastName)),
+                        "LastName should contain symbols of latin alphabet without spaces");
+
+        Validate.isTrue(login.contains("@"));
+        Validate.isTrue(getCustomers().stream().noneMatch(c -> c.getLogin().equals(login)), "Customer with login already exist");
+
+        Validate.isTrue(pass.length() >= 6 && pass.length() < 13, "Password's length should be more or equal 6 symbols and less or equal 12 symbols.");
+        Validate.isTrue(!pass.equalsIgnoreCase("123qwe"), "Password is easy.");
+
+        Validate.isTrue(customer.getBalance() == 0);
 
         return dbService.createCustomer(customer);
     }
@@ -62,4 +88,9 @@ public class CustomerManager extends ParentManager {
     public Customer topUpBalance(UUID customerId, int amount) {
         throw new NotImplementedException("Please implement the method.");
     }
+
+    private String toNameCase(String name) {
+        return name.substring(0, 1).toUpperCase().concat(name.substring(1).toLowerCase());
+    }
+
 }

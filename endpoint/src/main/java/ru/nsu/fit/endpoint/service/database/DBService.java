@@ -17,6 +17,7 @@ public class DBService {
 
     private static final String SELECT_CUSTOMER = "SELECT id FROM CUSTOMER WHERE login='%s'";
     private static final String SELECT_CUSTOMERS = "SELECT * FROM CUSTOMER";
+    private static final String SELECT_PLANS = "SELECT * FROM PLAN";
 
     private Logger logger;
     private static final Object generalMutex = new Object();
@@ -114,6 +115,30 @@ public class DBService {
                                 plan.getDetails(),
                                 plan.getFee()));
                 return plan;
+            } catch (SQLException ex) {
+                logger.error(ex.getMessage(), ex);
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    public List<Plan> getPlans(){
+        synchronized (generalMutex) {
+            logger.info("Method 'getPlans' was called.");
+
+            try {
+                Statement statement = connection.createStatement();
+                ResultSet rs = statement.executeQuery(SELECT_PLANS);
+                List<Plan> result = Lists.newArrayList();
+                while (rs.next()) {
+                    Plan plan = new Plan();
+                    plan.setName(rs.getString(2));
+                    plan.setDetails(rs.getString(3));
+                    plan.setFee(rs.getInt(4));
+
+                    result.add(plan);
+                }
+                return result;
             } catch (SQLException ex) {
                 logger.error(ex.getMessage(), ex);
                 throw new RuntimeException(ex);

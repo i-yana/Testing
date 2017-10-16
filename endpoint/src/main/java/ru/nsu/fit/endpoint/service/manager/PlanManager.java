@@ -1,6 +1,7 @@
 package ru.nsu.fit.endpoint.service.manager;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.Validate;
 import org.slf4j.Logger;
 import ru.nsu.fit.endpoint.service.database.DBService;
 import ru.nsu.fit.endpoint.service.database.data.Plan;
@@ -21,7 +22,24 @@ public class PlanManager extends ParentManager {
      */
     public Plan createPlan(Plan plan) {
 
-        // типо проверка тут
+        Validate.notNull(plan, "Argument 'plan' is null.");
+
+        String planName = plan.getName();
+        String details = plan.getDetails();
+        int fee = plan.getFee();
+
+        Validate.notEmpty(planName, "Name is empty");
+        Validate.notEmpty(details, "Details is empty");
+
+        Validate.isTrue(planName.matches("[a-zA-Z]+$")
+                        && planName.length()<=128
+                        && planName.length()>=2,
+                        "PlanName's length should be more or equal 2 symbols and less or equal 128 symbols, not contain special symbols");
+        Validate.isTrue(getPlans().stream().noneMatch(p -> p.getName().equals(planName)), "Plan with name already exist");
+
+        Validate.isTrue(details.length()<=1024 && details.length()>=1);
+        Validate.isTrue(fee >= 0 && fee <= 999999);
+
         return dbService.createPlan(plan);
     }
 
@@ -36,7 +54,10 @@ public class PlanManager extends ParentManager {
     /**
      * Метод возвращает список планов доступных для покупки.
      */
-    public List<Plan> getPlans(UUID customerId) {
+    public List<Plan> getPlansByCustomerId(UUID customerId) {
         throw new NotImplementedException("Please implement the method.");
+    }
+    public List<Plan> getPlans() {
+        return dbService.getPlans();
     }
 }
